@@ -43,7 +43,7 @@ public class Node extends Thread {
 
 				// DETECTAR SI EXISTE UN LIDER
 				try {
-					Socket try_leader = new Socket(ip, port);
+					Socket try_leader = new Socket(ip, 5000);
 					DataInputStream in = new DataInputStream(try_leader.getInputStream());
 					String try_beat = in.readUTF();
 					this.isLeader = false;
@@ -63,12 +63,12 @@ public class Node extends Thread {
 				/////////////////////////// NODO LIDER ///////////////////////////
 				////////////////////////////////////////////////////////////////////
 				if (this.isLeader == true) {
-					System.out.println("///////////////////////////////////////////////");
-					System.out.println("////Nodo (" + this.ip + ") se convirtió en Lider////");
-					System.out.println("/////////////////////////////////////////////\n");
+					System.out.println("///////////////////////////////////");
+					System.out.println("////Nodo se convirtió en Lider////");
+					System.out.println("/////////////////////////////////\n");
 
 					// Socket server del nodo
-					ServerSocket server = new ServerSocket(port);
+					ServerSocket server = new ServerSocket(5000);
 
 					// Lista para recordar los seguidores
 					ArrayList<Socket> seguidores = new ArrayList<>();
@@ -80,6 +80,12 @@ public class Node extends Thread {
 						DataInputStream in = new DataInputStream(sc2.getInputStream());
 						DataOutputStream out = new DataOutputStream(sc2.getOutputStream());
 
+						// Agreegar nodo seguidor a la lista de seguidores
+						System.out.println(">>> Seguidor conectado: " + sc2.toString());
+						if (!seguidores.contains(sc2)){
+							seguidores.add(sc2);
+						}
+
 						// Lista de seguidores
 						System.out.println("\nLista de Seguidores: ");
 						for(Socket seguidor : seguidores){
@@ -87,11 +93,7 @@ public class Node extends Thread {
 						}
 						System.out.println("\n");
 
-						// Agreegar nodo seguidor a la lista de seguidores
-						System.out.println(">>> Seguidor conectado");
-						if (!seguidores.contains(sc2)){
-							seguidores.add(sc2);
-						}
+						
 
 						// Enviar pulso
 						System.out.println("Envio: <3");
@@ -132,7 +134,7 @@ public class Node extends Thread {
 					System.out.println("");
 
 					// Socket propio del nodo (no cambia)
-					Socket sc = new Socket(ip, port);
+					Socket sc = new Socket(ip, 5000);
 
 					DataInputStream in = new DataInputStream(sc.getInputStream());
 					DataOutputStream out = new DataOutputStream(sc.getOutputStream());
@@ -143,9 +145,25 @@ public class Node extends Thread {
 
 					while (true) {
 
+						// DETECTAR SI EXISTE UN LIDER CUANDO SE DESCONECTO
+						if(!timer.isConnected()){
+							System.out.println("\nDESCONECTADO........");
+						try {
+							System.out.println("PRUEBA HEARTBEAT");
+							Socket try_leader = new Socket(ip, 5000);
+							DataInputStream in2 = new DataInputStream(try_leader.getInputStream());
+							String try_beat = in2.readUTF();
+							System.out.println("SE RECUPERO EL HEARTBEAT\n");
+							timer.setConnected(true);
+							Socket sc2 = new Socket(ip, 5000);
+							in = new DataInputStream(sc2.getInputStream());
+							try_leader.close();
+						} catch (Exception trye) {
+							System.out.println("NO HEARTBEAT\n");
+						}}
 						// Revisar si ya es TIMEOUT
 						if (timer.isTimeout() == true) {
-							//TIMEOUT, primero en estado timeout es lider
+							//TIMEOUT, primero en llegar a estado timeout se convierte en lider
 							this.isLeader = true;
 							break;
 						}

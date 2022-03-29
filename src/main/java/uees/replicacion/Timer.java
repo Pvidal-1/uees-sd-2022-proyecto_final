@@ -44,7 +44,7 @@ public class Timer extends Thread{
 		while(this.timeout == false) {
 		
 		// TIEMPO DE ESPERA DE HEARTBEAT
-		if(this.time>=10) {
+		if(this.time>=20) {
 			this.setTimeout(true);
 		}
 		
