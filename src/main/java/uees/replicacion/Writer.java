@@ -31,9 +31,9 @@ public class Writer {
             myWriter.write("(" + this.getCounter() + ") " + httpMethod + ": " + message + "\n");
             myWriter.close();
             this.setCounter(this.getCounter() + 1);
-            System.out.println("Successfully wrote to the file.");
+            System.out.println("\nSuccessfully wrote to log.\n");
         } catch (IOException e) {
-            System.out.println("An error occurred.");
+            System.out.println("An error occurred writing to log.");
             e.printStackTrace();
         }
     }

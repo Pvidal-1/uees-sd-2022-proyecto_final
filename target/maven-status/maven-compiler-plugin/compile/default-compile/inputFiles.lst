@@ -1,13 +1,8 @@
 /home/pvi/Repositories/SD/uees-sd-2022-proyecto_final/src/main/java/uees/replicacion/main.java
 /home/pvi/Repositories/SD/uees-sd-2022-proyecto_final/src/main/java/uees/replicacion/Writer.java
-/home/pvi/Repositories/SD/uees-sd-2022-proyecto_final/src/main/java/uees/replicacion/MessageResource.java
-/home/pvi/Repositories/SD/uees-sd-2022-proyecto_final/src/main/java/uees/replicacion/Message.java
-/home/pvi/Repositories/SD/uees-sd-2022-proyecto_final/src/main/java/uees/replicacion/Server.java
 /home/pvi/Repositories/SD/uees-sd-2022-proyecto_final/src/main/java/uees/replicacion/Database.java
+/home/pvi/Repositories/SD/uees-sd-2022-proyecto_final/src/main/java/uees/replicacion/MessageResource.java
 /home/pvi/Repositories/SD/uees-sd-2022-proyecto_final/src/main/java/uees/replicacion/Node.java
-/home/pvi/Repositories/SD/uees-sd-2022-proyecto_final/src/main/java/uees/replicacion/Client.java
-/home/pvi/Repositories/SD/uees-sd-2022-proyecto_final/src/main/java/uees/replicacion/ClientThread.java
-/home/pvi/Repositories/SD/uees-sd-2022-proyecto_final/src/main/java/uees/replicacion/Heartbeat.java
-/home/pvi/Repositories/SD/uees-sd-2022-proyecto_final/src/main/java/uees/replicacion/ServerThread.java
+/home/pvi/Repositories/SD/uees-sd-2022-proyecto_final/src/main/java/uees/replicacion/Message.java
+/home/pvi/Repositories/SD/uees-sd-2022-proyecto_final/src/main/java/uees/replicacion/Timer.java
 /home/pvi/Repositories/SD/uees-sd-2022-proyecto_final/src/main/java/uees/replicacion/MessageService.java
-/home/pvi/Repositories/SD/uees-sd-2022-proyecto_final/src/main/java/uees/replicacion/SocketThread.java

@@ -19,7 +19,7 @@ public class Node extends Thread {
 	private Socket leader;
 	private File log;
 	private Writer wr;
-	private Heartbeat timer;
+	private Timer timer;
 	private MessageService mservice;
 	private MessageResource mresource;
 	private Database database;
@@ -29,7 +29,7 @@ public class Node extends Thread {
 		this.port = port;
 		this.log = new File("logs.txt");
 		this.wr = new Writer("logs.txt");
-		this.timer = new Heartbeat();
+		this.timer = new Timer();
 		this.mservice = new MessageService();
 		this.mresource = new MessageResource();
 		this.database = new Database();
@@ -39,15 +39,9 @@ public class Node extends Thread {
 	public void run() {
 		try {
 			
-			// Socket propio del nodo (no cambia)
-			// Socket sc = new Socket(ip, port);
-			// Socket server del nodo (cambia)
-			// ServerSocket server = new ServerSocket(port);
-
-			// Revisa si es lider o no
 			while (true) {
 
-				//Determinar si debería ser líder o no
+				// DETECTAR SI EXISTE UN LIDER
 				try {
 					Socket try_leader = new Socket(ip, port);
 					DataInputStream in = new DataInputStream(try_leader.getInputStream());
@@ -58,37 +52,54 @@ public class Node extends Thread {
 					this.isLeader = true;
 				}
 				
-				System.out.println("Ip: " + this.ip + " || " + this.ip.getClass());
-				System.out.println("Port: " + this.port + " || " + this.port.getClass());
-				System.out.println("isleader: " + this.isLeader + " || " + this.isLeader.getClass());
+				// DETALLES DEL NODO
+				System.out.println("Detalles del nodo:");
+				System.out.println("Ip: " + this.ip);
+				System.out.println("Port: " + this.port);
+				System.out.println("isleader: " + this.isLeader);
+				System.out.println("");
 
-
+				////////////////////////////////////////////////////////////////////
+				/////////////////////////// NODO LIDER ///////////////////////////
+				////////////////////////////////////////////////////////////////////
 				if (this.isLeader == true) {
-					System.out.println("Nodo (" + this.ip + ") se convirtió en Lider");
+					System.out.println("///////////////////////////////////////////////");
+					System.out.println("////Nodo (" + this.ip + ") se convirtió en Lider////");
+					System.out.println("/////////////////////////////////////////////\n");
+
 					// Socket server del nodo
 					ServerSocket server = new ServerSocket(port);
-
-					// Asigno el socket de lider al suyo
-					// this.leader = sc;
 
 					// Lista para recordar los seguidores
 					ArrayList<Socket> seguidores = new ArrayList<>();
 
 					while (true) {
+						System.out.println("\n----------------------------------------------");
 						// Esperar a que se conecte seguidor
 						Socket sc2 = server.accept();
-						System.out.println("Seguidor conectado");
-						seguidores.add(sc2);
-
 						DataInputStream in = new DataInputStream(sc2.getInputStream());
 						DataOutputStream out = new DataOutputStream(sc2.getOutputStream());
+
+						// Lista de seguidores
+						System.out.println("\nLista de Seguidores: ");
+						for(Socket seguidor : seguidores){
+							System.out.println(seguidor.toString());	
+						}
+						System.out.println("\n");
+
+						// Agreegar nodo seguidor a la lista de seguidores
+						System.out.println(">>> Seguidor conectado");
+						if (!seguidores.contains(sc2)){
+							seguidores.add(sc2);
+						}
 
 						// Enviar pulso
 						System.out.println("Envio: <3");
 						out.writeUTF("<3");
 
-						System.out.println("MessagesR: " + mresource.getMessages());
-						System.out.println("MessagesS: " + mservice.getAllMessages());
+						//Message Resource y Message Service
+						//System.out.println("MessagesR: " + mresource.getMessages());
+						//System.out.println("MessagesS: " + mservice.getAllMessages());
 
 						// Get message de message resource (Puerto 8080)
 						/*Socket sc = new Socket(ip, 8080);
@@ -111,66 +122,67 @@ public class Node extends Thread {
 						 */
 
 					}
+				////////////////////////////////////////////////////////////////////
+				/////////////////////////// NODO REPLICA ///////////////////////////
+				////////////////////////////////////////////////////////////////////
 				} else {
-					System.out.println("Nodo inicializado como seguidor");
+					System.out.println("////////////////////////////////////////");
+					System.out.println("////Nodo inicializado como seguidor////");
+					System.out.println("//////////////////////////////////////\n");
+					System.out.println("");
 
 					// Socket propio del nodo (no cambia)
 					Socket sc = new Socket(ip, port);
 
+					DataInputStream in = new DataInputStream(sc.getInputStream());
+					DataOutputStream out = new DataOutputStream(sc.getOutputStream());
+
 					// Iniciar timer
 					timer.start();
 					String pulse = "";
+
 					while (true) {
 
-						DataInputStream in = new DataInputStream(sc.getInputStream());
-						DataOutputStream out = new DataOutputStream(sc.getOutputStream());
+						// Revisar si ya es TIMEOUT
+						if (timer.isTimeout() == true) {
+							//TIMEOUT, primero en estado timeout es lider
+							this.isLeader = true;
+							break;
+						}
 
-						// Recibio pulso???
+						// HEARTBEAT
 						try {
+							// SI RECIBIO PULSO <3
 							pulse = in.readUTF();
 							if (pulse.equals("<3")) {
 								timer.setConnected(true);
 							}
 						} catch (Exception e1) {
-							// TODO Auto-generated catch block
+							// NO RECIBIO PULSO <3
 							pulse = "</3";
 							timer.setConnected(false);
-							//System.out.println("\nTime: " + timer.getTime());
-
 						}
 
-						// Se termino el tiempo???
-						if (timer.isTimeout() == true) {
-							break;
-						}
-
+						// PRINT HEARTBEAT
 						try {
 							System.out.println("Recibo: " + pulse);
-							//System.out.println("Connected? " + timer.isConnected());
 							TimeUnit.SECONDS.sleep(1);
 						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
 					}
-					System.out.println("Ya no hay lider... Yo soy el nuevo lider");
-					timer.setTimeout(true);
-					try {
-						TimeUnit.SECONDS.sleep(1);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					this.isLeader = true;
 				}
 			}
 
 		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	@Override
+	public String toString() {
+		return("Node (" + ip + ": " + port + ") "); 
 	}
 }

@@ -25,7 +25,6 @@ public class MessageResource {
 	private MessageService messageService = new MessageService();
 	private Writer wr = new Writer("logs.txt");
 	
-	
 
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
@@ -49,7 +48,6 @@ public class MessageResource {
 	public Message updateMessage(@PathParam("messageId") Integer id, Message message) {
 		message.setId(id);
 		wr.writeToLog("PUT", message.toString());
-
 		return messageService.updateMessage(message);
 	}
 	
