@@ -20,7 +20,6 @@ public class Node extends Thread {
 	private Socket leader;
 	private File log;
 	private Writer wr;
-	//private Timer timer;
 	private MessageService mservice;
 	private MessageResource mresource;
 	private Database database;
@@ -30,7 +29,6 @@ public class Node extends Thread {
 		this.port = port;
 		this.log = new File("logs.txt");
 		this.wr = new Writer("logs.txt");
-		//this.timer = new Timer();
 		this.mservice = new MessageService();
 		this.mresource = new MessageResource();
 		this.database = new Database();
