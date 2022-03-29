@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.UnknownHostException;
-import java.util.Scanner;
 
 public class main {
 public static void main(String[] args) throws InterruptedException, IOException {
@@ -21,16 +20,12 @@ public static void main(String[] args) throws InterruptedException, IOException 
 		      System.out.println("Ha ocurrido un error creando el log.");
 		      e.printStackTrace();
 		    }
-	
-		Scanner sn = new Scanner(System.in);
 		
-		System.out.println("Ingrese el puerto");
-		int port = sn.nextInt();
-		
-		System.out.println("Ingrese si es lider");
-		boolean num = sn.nextBoolean();
-		
-		Node nd = new Node("127.0.0.1", port, num);
+		String ip = args[0];
+		int port = Integer.parseInt(args[1]);
+		Boolean lider = Boolean.parseBoolean(args[2]);
+
+		Node nd = new Node(ip, port, lider);
 		nd.start();
 		
 		
