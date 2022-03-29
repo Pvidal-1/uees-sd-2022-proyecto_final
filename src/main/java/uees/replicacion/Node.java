@@ -24,10 +24,9 @@ public class Node extends Thread {
 	private MessageResource mresource;
 	private Database database;
 
-	public Node(String ip, Integer port, Boolean isLeader) {
+	public Node(String ip, Integer port) {
 		this.ip = ip;
 		this.port = port;
-		this.isLeader = isLeader;
 		this.log = new File("logs.txt");
 		this.wr = new Writer("logs.txt");
 		this.timer = new Heartbeat();
@@ -39,9 +38,7 @@ public class Node extends Thread {
 	@Override
 	public void run() {
 		try {
-			System.out.println("Ip: " + this.ip + " || " + this.ip.getClass());
-			System.out.println("Port: " + this.port + " || " + this.port.getClass());
-			System.out.println("isleader: " + this.isLeader + " || " + this.isLeader.getClass());
+			
 			// Socket propio del nodo (no cambia)
 			// Socket sc = new Socket(ip, port);
 			// Socket server del nodo (cambia)
@@ -49,9 +46,26 @@ public class Node extends Thread {
 
 			// Revisa si es lider o no
 			while (true) {
+
+				//Determinar si debería ser líder o no
+				try {
+					Socket try_leader = new Socket(ip, port);
+					DataInputStream in = new DataInputStream(try_leader.getInputStream());
+					String try_beat = in.readUTF();
+					this.isLeader = false;
+					try_leader.close();
+				} catch (Exception trye) {
+					this.isLeader = true;
+				}
+				
+				System.out.println("Ip: " + this.ip + " || " + this.ip.getClass());
+				System.out.println("Port: " + this.port + " || " + this.port.getClass());
+				System.out.println("isleader: " + this.isLeader + " || " + this.isLeader.getClass());
+
+
 				if (this.isLeader == true) {
 					System.out.println("Nodo (" + this.ip + ") se convirtió en Lider");
-					// Socket server del nodo (cambia)
+					// Socket server del nodo
 					ServerSocket server = new ServerSocket(port);
 
 					// Asigno el socket de lider al suyo
@@ -76,8 +90,8 @@ public class Node extends Thread {
 						System.out.println("MessagesR: " + mresource.getMessages());
 						System.out.println("MessagesS: " + mservice.getAllMessages());
 
-						// Get message de message resource
-						Socket sc = new Socket(ip, 8080);
+						// Get message de message resource (Puerto 8080)
+						/*Socket sc = new Socket(ip, 8080);
 						ObjectInputStream ois = new ObjectInputStream(sc.getInputStream());
 						Message recieved = new Message();
 						try {
@@ -90,7 +104,7 @@ public class Node extends Thread {
 						mresource.addMessage(recieved);
 						
 						System.out.println("MessagesR: " + mresource.getMessages());
-						System.out.println("MessagesS: " + mservice.getAllMessages());
+						System.out.println("MessagesS: " + mservice.getAllMessages());*/
 
 						/*
 						 * for(Message msj : mservice.getAllMessages()) { wr.writeToLog("GET", msj); }

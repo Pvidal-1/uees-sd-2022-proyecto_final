@@ -23,9 +23,8 @@ public static void main(String[] args) throws InterruptedException, IOException 
 		
 		String ip = args[0];
 		int port = Integer.parseInt(args[1]);
-		Boolean lider = Boolean.parseBoolean(args[2]);
 
-		Node nd = new Node(ip, port, lider);
+		Node nd = new Node(ip, port);
 		nd.start();
 		
 		
