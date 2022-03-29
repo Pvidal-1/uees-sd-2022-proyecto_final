@@ -9,6 +9,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 public class Node extends Thread {
@@ -19,7 +20,7 @@ public class Node extends Thread {
 	private Socket leader;
 	private File log;
 	private Writer wr;
-	private Timer timer;
+	//private Timer timer;
 	private MessageService mservice;
 	private MessageResource mresource;
 	private Database database;
@@ -29,7 +30,7 @@ public class Node extends Thread {
 		this.port = port;
 		this.log = new File("logs.txt");
 		this.wr = new Writer("logs.txt");
-		this.timer = new Timer();
+		//this.timer = new Timer();
 		this.mservice = new MessageService();
 		this.mresource = new MessageResource();
 		this.database = new Database();
@@ -66,7 +67,7 @@ public class Node extends Thread {
 					System.out.println("///////////////////////////////////");
 					System.out.println("////Nodo se convirtió en Lider////");
 					System.out.println("/////////////////////////////////\n");
-
+				
 					// Socket server del nodo
 					ServerSocket server = new ServerSocket(5000);
 
@@ -92,8 +93,6 @@ public class Node extends Thread {
 							System.out.println(seguidor.toString());	
 						}
 						System.out.println("\n");
-
-						
 
 						// Enviar pulso
 						System.out.println("Envio: <3");
@@ -140,6 +139,7 @@ public class Node extends Thread {
 					DataOutputStream out = new DataOutputStream(sc.getOutputStream());
 
 					// Iniciar timer
+					Timer timer = new Timer();
 					timer.start();
 					String pulse = "";
 
@@ -149,18 +149,24 @@ public class Node extends Thread {
 						if(!timer.isConnected()){
 							System.out.println("\nDESCONECTADO........");
 						try {
+							
 							System.out.println("PRUEBA HEARTBEAT");
+
 							Socket try_leader = new Socket(ip, 5000);
 							DataInputStream in2 = new DataInputStream(try_leader.getInputStream());
 							String try_beat = in2.readUTF();
+
 							System.out.println("SE RECUPERO EL HEARTBEAT\n");
 							timer.setConnected(true);
+
 							Socket sc2 = new Socket(ip, 5000);
 							in = new DataInputStream(sc2.getInputStream());
 							try_leader.close();
+
 						} catch (Exception trye) {
 							System.out.println("NO HEARTBEAT\n");
 						}}
+
 						// Revisar si ya es TIMEOUT
 						if (timer.isTimeout() == true) {
 							//TIMEOUT, primero en llegar a estado timeout se convierte en lider
@@ -182,19 +188,20 @@ public class Node extends Thread {
 						}
 
 						// PRINT HEARTBEAT
-						try {
-							System.out.println("Recibo: " + pulse);
-							TimeUnit.SECONDS.sleep(1);
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
+						System.out.println("Recibo: " + pulse);
+						TimeUnit.SECONDS.sleep(1);
+						
 					}
+					// SECCION DEL TIMEOUT
+					TimeUnit.MILLISECONDS.sleep(port + Math.round(Math.random()*3000));
 				}
 			}
 
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 	}
